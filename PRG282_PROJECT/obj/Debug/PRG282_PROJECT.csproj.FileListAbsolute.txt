@@ -1,0 +1,11 @@
+C:\Users\britn\Downloads\PRG282_PROJECT\bin\Debug\PRG282_PROJECT.exe.config
+C:\Users\britn\Downloads\PRG282_PROJECT\bin\Debug\PRG282_PROJECT.exe
+C:\Users\britn\Downloads\PRG282_PROJECT\bin\Debug\PRG282_PROJECT.pdb
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.AssemblyReference.cache
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.Form1.resources
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.Properties.Resources.resources
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.GenerateResource.cache
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.CoreCompileInputs.cache
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.exe
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.pdb
+C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.exe.config

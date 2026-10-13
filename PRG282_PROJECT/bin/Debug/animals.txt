@@ -1,0 +1,24 @@
+WR-1001|Naledi|Lion|5|86
+WR-1002|Kibo|Cheetah|3|45
+WR-1003|Simba|Leopard|4|62
+WR-1004|Maya|Zebra|2|90
+WR-1005|Zara|Elephant|7|30
+WR-1006|Thabo|Rhino|6|78
+WR-1007|Lindiwe|Giraffe|4|95
+WR-1008|Milo|Hyena|3|15
+WR-1009|Sipho|Buffalo|8|55
+WR-1010|Duma|Serval|2|88
+WR-1011|Jabu|Hippopotamus|9|40
+WR-1012|Nandi|Impala|1|92
+WR-1013|Koa|Wild Dog|3|67
+WR-1014|Tandi|Warthog|5|73
+WR-1015|Bheki|Kudu|6|82
+WR-1016|Amini|Caracal|3|35
+WR-1017|Sekai|Meerkats|2|98
+WR-1018|Bongani|Eland|7|60
+WR-1019|Tumi|Pangolin|4|25
+WR-1020|Zola|Baboon|5|81
+WR-1021|Lulu|Baboon|7|12
+WR-1022|Peter|Baboon|4|23
+WR-1023|Lulu|Owl|2|46
+WR-1024|Pina|Snake|3|23
