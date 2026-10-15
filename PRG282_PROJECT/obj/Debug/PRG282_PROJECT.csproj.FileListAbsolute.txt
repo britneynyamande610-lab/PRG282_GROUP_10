@@ -9,3 +9,13 @@ C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.CoreComp
 C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.exe
 C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.pdb
 C:\Users\britn\Downloads\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.exe.config
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\bin\Debug\PRG282_PROJECT.exe.config
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\bin\Debug\PRG282_PROJECT.exe
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\bin\Debug\PRG282_PROJECT.pdb
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.AssemblyReference.cache
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.Form1.resources
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.Properties.Resources.resources
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.GenerateResource.cache
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.csproj.CoreCompileInputs.cache
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.exe
+C:\ONEDRIVE\OneDrive - belgiumcampus.ac.za\PRG282\PROJECT\PRG282_PROJECT\obj\Debug\PRG282_PROJECT.pdb
