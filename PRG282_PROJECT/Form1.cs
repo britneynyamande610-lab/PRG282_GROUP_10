@@ -143,10 +143,10 @@ namespace PRG282_PROJECT
         }
 
         //Values are validated, recover score is recalculated and updated info is only rewritten in the animal's line im animals.txt
-                     //btnSaveChanges
+        //btnSaveChanges
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            if(editingID == null)
+            if (editingID == null)
             {
                 MessageBox.Show("Please load an animal for editing(click row).", "Error");
                 return;
@@ -160,7 +160,7 @@ namespace PRG282_PROJECT
             if (name.Length < 1 || name.Length > 30 || name.Contains("|"))
             {
                 MessageBox.Show("Name is required, must be between 1 and 30 characters and not contain '|'.", "Validation Error");
-               
+
                 txtName.Focus();
                 return;
             }
@@ -194,7 +194,7 @@ namespace PRG282_PROJECT
                 return;//error message already shown in ReplaceAnimalInFile
             }
 
-            MessageBox.Show("Animal updated successfully!\n\nStatus: " + updated.HealthStatus +"\nHousing Unit: " + updated.HousingUnit, "Success");
+            MessageBox.Show("Animal updated successfully!\n\nStatus: " + updated.HealthStatus + "\nHousing Unit: " + updated.HousingUnit, "Success");
             ExitEditMode();
             LoadAnimalsData();
         }
@@ -211,7 +211,7 @@ namespace PRG282_PROJECT
                 {
                     string lineID = lines[i].Split('|')[0].Trim();
 
-                    if(!replaced && lineID.Equals(updated.AnimalID, StringComparison.OrdinalIgnoreCase))
+                    if (!replaced && lineID.Equals(updated.AnimalID, StringComparison.OrdinalIgnoreCase))
                     {
                         lines[i] = updated.Display();
                         replaced = true;
@@ -225,8 +225,8 @@ namespace PRG282_PROJECT
                 }
                 //Writes all lines to animals.txt without a BOM(byte order mark)                          
                 File.WriteAllLines(filePath, lines, new UTF8Encoding(false));
-                                                        //BOM is a small amount of invisible bytes of data that indicates the encoding of a text file.
-                                                        //We make the encoding false to avoid adding a BOM to the start of the file
+                //BOM is a small amount of invisible bytes of data that indicates the encoding of a text file.
+                //We make the encoding false to avoid adding a BOM to the start of the file
                 return true;
 
             }
@@ -331,21 +331,94 @@ namespace PRG282_PROJECT
             if (found == null)
             {
                 MessageBox.Show("No animal with ID '" + searchID + "' was found.", "Search");
-                return; 
+                return;
             }
 
             LoadAnimalIntoForm(found);
 
             //Highlights the mathing row in the grid
-            foreach(DataGridViewRow row in dgvAnimals.Rows)
+            foreach (DataGridViewRow row in dgvAnimals.Rows)
             {
-                if(row.DataBoundItem == found)
+                if (row.DataBoundItem == found)
                 {
                     dgvAnimals.ClearSelection();
                     row.Selected = true;
                     break;
-                } 
+                }
             }
         }
+    
+    private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (dgvAnimals.CurrentRow == null || dgvAnimals.CurrentRow.DataBoundItem == null)
+            {
+                MessageBox.Show("Please select an animal to delete.", "Validation Error");
+                return;
+            }
+
+            Animal selectedAnimal = dgvAnimals.CurrentRow.DataBoundItem as Animal;
+            if (selectedAnimal == null)
+            {
+                MessageBox.Show("Please select a valid animal to delete.", "Validation Error");
+                return; 
+            }
+            DialogResult result = MessageBox.Show($"Delete {selectedAnimal.AnimalID} ({selectedAnimal.Name})? This cannot be undone.","Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                if (DeleteAnimalFromFile(selectedAnimal.AnimalID))
+                {
+                    MessageBox.Show("Animal deleted successfully!", "Success");
+                    ExitEditMode();
+                    LoadAnimalsData();
+                }
+            }
+         }
+        private bool DeleteAnimalFromFile(string animalID)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    MessageBox.Show("animals.txt could not be found.", "File Error");
+                    return false;
+                }
+
+                List<string> lines = File.ReadAllLines(filePath).ToList();
+
+                //Removing lines matching animalID
+                lines.RemoveAll(line =>
+                {
+                    if (string.IsNullOrWhiteSpace(line)) return false;
+                    string lineID = line.Split('|')[0].Trim();
+                    return lineID.Equals(animalID, StringComparison.OrdinalIgnoreCase);
+                });
+
+                File.WriteAllLines(filePath, lines, new UTF8Encoding(false));
+                return true;
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBox.Show("animals.txt could not be found, animal was not deleted.", "File Error");
+            }
+            catch (DirectoryNotFoundException)
+            {
+                MessageBox.Show("The folder containing animals.txt could not be found, animal was not deleted", "File Error");
+            }
+            catch (IOException)
+            {
+                MessageBox.Show("Could not save file because it is open in another application.", "File Error");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("You do not have permissions to modify animals.txt, animal was not deleted.", "File Error");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An unexpected error occured while deleting: " + ex.Message, "Error");
+            }
+            return false;
+        }
     }
+
 }
