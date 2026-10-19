@@ -173,14 +173,14 @@ namespace PRG282_PROJECT
             }
 
             //NumbersStyles.None rejects decimals, signs and letters(whole numbers only)
-            if (!int.TryParse(age, NumberStyles.None, CultureInfo.InvariantCulture, out int ages) || ages < 0 || ages > 100)
+            if(!int.TryParse(age, out int ages) || ages < 0 || ages > 100)
             {
                 MessageBox.Show("Age must be a whole number between 0 and 100.", "Validation Error");
                 txtAge.Focus();
                 return;
             }
 
-            if (!int.TryParse(score, NumberStyles.None, CultureInfo.InvariantCulture, out int scores) || scores < 0 || scores > 100)
+            if (!int.TryParse(score, out int scores) || scores < 0 || scores > 100)
             {
                 MessageBox.Show("Recovery Score must be a whole number between 0 and 100.", "Validation Error");
                 txtScore.Focus();
