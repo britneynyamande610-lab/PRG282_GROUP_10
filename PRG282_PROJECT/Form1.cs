@@ -1,17 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using System.Globalization;
+using PRG282_PROJECT.BusinessLayer;
 
 
 namespace PRG282_PROJECT
@@ -20,109 +20,72 @@ namespace PRG282_PROJECT
 
     {
         private string filePath = "animals.txt";
-        private string editingID = null; // Holds the ID of the animal that is being edited
+        private string editingID = null;
+
+        private AnimalDAL animalDAL;
+
         public Form1()
         {
             InitializeComponent();
-             animalDAL = new AnimalDAL(filePath);
+            animalDAL = new AnimalDAL(filePath);
         }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
             LoadAnimalsData();
         }
-
+        
 
         private void LoadAnimalsData()
         {
             try
-            {  List<Animal> animalList = animalDAL.GetAllAnimals();
+            {
+                List<Animal> animalList = animalDAL.GetAllAnimals();
 
                 dgvAnimals.DataSource = null;
                 dgvAnimals.DataSource = animalList;
-            
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-            MessageBox.Show("Error reading file: " + ex.Message, "Error");
+                MessageBox.Show("Error reading file: " + ex.Message, "Error");
             }
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-
-    try
-    {
-
-                string id = txtID.Text;
-                string name = txtName.Text;
-                string species = txtSpecies.Text;
-                string ageText = txtAge.Text;
-                string scoreText = txtScore.Text;
-     if (string.IsNullOrEmpty(id))
-    {
-        MessageBox.Show("ID is required.", "Validation Error");
-        return;
-    }
-
-    if (!id.StartsWith("WR-"))
-    {
-        MessageBox.Show("ID must start with 'WR-'.", "Validation Error");
-        return;
-    }
-
-    if (id.Contains("|"))
-    {
-        MessageBox.Show("ID must not contain '|'.", "Validation Error");
-        return;
-    }
-
-            int score;
-            if (int.TryParse(scoreText, out score))
-        {
-            if (score < 0 || score > 100)
+            try
             {
-            MessageBox.Show("Score must be between 0 and 100.", "Validation Error");
-            return;
-            }
-            }
-            else
-            {
-            MessageBox.Show("Score must be a whole number.", "Validation Error");
-            return;
-            }
+                string id = txtID.Text.Trim();
+                string name = txtName.Text.Trim();
+                string species = txtSpecies.Text.Trim();
 
-            int age;
-            if (int.TryParse(ageText, out age))
-            {
-            if (age < 0 || age > 100)
-            {
-            MessageBox.Show("Age must a number between 0 and 100", "Validation Error");
-            return;
-            }
-            }
-            else
-            {
-            MessageBox.Show("Age must be a whole number.", "Validation Error");
-            return;
-            }
+                int age, score;
+                string error = AnimalsValidation.ValidateInput(id, name, species,
+                    txtAge.Text.Trim(), txtScore.Text.Trim(),
+                    true, animalDAL.GetAllAnimals(), out age, out score);
 
-            Animal newAnimal = new Animal(id, name, species, age, score);
-            animalDAL.InsertAnimal(newAnimal);
+                if (error != null)
+                {
+                    MessageBox.Show(error, "Validation Error");
+                    return;
+                }
 
-            MessageBox.Show("Animal added successfully!", "Success");
-            ClearInputs();
-            LoadAnimalsData();
-            }
-               
+                Animal newAnimal = new Animal(id, name, species, age, score);
+                AnimalsValidation.ValidateAnimal(newAnimal);
+                animalDAL.InsertAnimal(newAnimal);
+
+                MessageBox.Show("Animal added successfully!", "Success");
+                ClearInputs();
+                LoadAnimalsData();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error writing to file: " + ex.Message, "Error");
             }
         }
-        //clears all textboxes 
+
         private void ClearInputs()
         {
             txtID.Clear();
@@ -131,9 +94,6 @@ namespace PRG282_PROJECT
             txtAge.Clear();
             txtScore.Clear();
         }
-
-        //Values are validated, recover score is recalculated and updated info is only rewritten in the animal's line im animals.txt
-        //btnSaveChanges
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (editingID == null)
@@ -141,108 +101,41 @@ namespace PRG282_PROJECT
                 MessageBox.Show("Please load an animal for editing(click row).", "Error");
                 return;
             }
-            //trim before validation, textID not included as it is read-only and not editable
+            //trim before validation, txtID is read-only while editing so the stored editingID is used
             string name = txtName.Text.Trim();
             string species = txtSpecies.Text.Trim();
-            string age = txtAge.Text.Trim();
-            string score = txtScore.Text.Trim();
 
-            if (name.Length < 1 || name.Length > 30 || name.Contains("|"))
+            int ages, scores;
+            string error = AnimalsValidation.ValidateInput(editingID, name, species,
+                txtAge.Text.Trim(), txtScore.Text.Trim(),
+                false, null, out ages, out scores);
+
+            if (error != null)
             {
-                MessageBox.Show("Name is required, must be between 1 and 30 characters and not contain '|'.", "Validation Error");
-
-                txtName.Focus();
-                return;
-            }
-
-            if (species.Length < 1 || species.Length > 30 || species.Contains("|"))
-            {
-                MessageBox.Show("Species is required, must be between 1 and 30 characters and not contain '|'.", "Validation Error");
-                txtSpecies.Focus();
-                return;
-            }
-
-            //NumbersStyles.None rejects decimals, signs and letters(whole numbers only)
-            if(!int.TryParse(age, out int ages) || ages < 0 || ages > 100)
-            {
-                MessageBox.Show("Age must be a whole number between 0 and 100.", "Validation Error");
-                txtAge.Focus();
-                return;
-            }
-
-            if (!int.TryParse(score, out int scores) || scores < 0 || scores > 100)
-            {
-                MessageBox.Show("Recovery Score must be a whole number between 0 and 100.", "Validation Error");
-                txtScore.Focus();
+                MessageBox.Show(error, "Validation Error");
                 return;
             }
             //The constructor calls CalculateStatusAndHousing, which calculates the health status and housing based on the recovery score.
             Animal updated = new Animal(editingID, name, species, ages, scores);
 
-            if (!ReplaceAnimalInFile(updated))
+            try
             {
-                return;//error message already shown in ReplaceAnimalInFile
+                if (!animalDAL.UpdateAnimal(updated))
+                {
+                    MessageBox.Show("Could not find " + updated.AnimalID + " in animals.txt.", "Update Error");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving animal: " + ex.Message, "File Error");
+                return;
             }
 
             MessageBox.Show("Animal updated successfully!\n\nStatus: " + updated.HealthStatus + "\nHousing Unit: " + updated.HousingUnit, "Success");
             ExitEditMode();
             LoadAnimalsData();
         }
-
-        //Rewrites animals.txt and replaces only the animal that needs to be updated
-        private bool ReplaceAnimalInFile(Animal updated)
-        {
-            try
-            {
-                string[] lines = File.ReadAllLines(filePath);
-                bool replaced = false;
-
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    string lineID = lines[i].Split('|')[0].Trim();
-
-                    if (!replaced && lineID.Equals(updated.AnimalID, StringComparison.OrdinalIgnoreCase))
-                    {
-                        lines[i] = updated.Display();
-                        replaced = true;
-                    }
-
-                }
-                if (!replaced)
-                {
-                    MessageBox.Show("Could not find " + updated.AnimalID + "in animals,txt.", "Update Error");
-                    return false;
-                }
-                //Writes all lines to animals.txt without a BOM(byte order mark)                          
-                File.WriteAllLines(filePath, lines, new UTF8Encoding(false));
-                //BOM is a small amount of invisible bytes of data that indicates the encoding of a text file.
-                //We make the encoding false to avoid adding a BOM to the start of the file
-                return true;
-
-            }
-            catch (FileNotFoundException)
-            {
-                MessageBox.Show("animals.txt could not be found, changes were not saved.", "File Error");
-            }
-            catch (DirectoryNotFoundException)
-            {
-                MessageBox.Show("The folder containing animals.txt could not be found, changes were not saved.", "File Error");
-            }
-            catch (IOException)
-            {
-                MessageBox.Show("Could not save file because it is open in another application.", "File Error");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("You do not have permission to change animals.txt, changes were not saved.", "File Error");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An unexpected error occurred while saving: " + ex.Message, "Error");
-            }
-            return false;
-        }
-
 
         //Load the details of the selected animal into the text boxes
         private void dgvAnimals_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -277,7 +170,7 @@ namespace PRG282_PROJECT
         {
             txtID.ReadOnly = editing; // makes txtID read-only when editing
             btnAdd.Enabled = !editing;
-            btnSave.Enabled = editing;
+           
 
             if (!editing)
             {
@@ -336,79 +229,64 @@ namespace PRG282_PROJECT
                     break;
                 }
             }
+
         }
-    
-    private void btnDelete_Click(object sender, EventArgs e)
+
+        private void btnSummary_Click_1(object sender, EventArgs e)
         {
-            if (dgvAnimals.CurrentRow == null || dgvAnimals.CurrentRow.DataBoundItem == null)
+            try
             {
-                MessageBox.Show("Please select an animal to delete.", "Validation Error");
-                return;
+                List<Animal> animals = dgvAnimals.DataSource as List<Animal> ?? new List<Animal>();
+                animalDAL.SaveSummary(animals, false);
+                MessageBox.Show("Summary report generated and saved to summary.txt successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            Animal selectedAnimal = dgvAnimals.CurrentRow.DataBoundItem as Animal;
-            if (selectedAnimal == null)
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a valid animal to delete.", "Validation Error");
-                return; 
+                MessageBox.Show("Error generating summary report: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            DialogResult result = MessageBox.Show($"Delete {selectedAnimal.AnimalID} ({selectedAnimal.Name})? This cannot be undone.","Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        }
 
-            if (result == DialogResult.Yes)
+        private void btnDelete_Click_1(object sender, EventArgs e)
+        {
+            try
             {
-                if (DeleteAnimalFromFile(selectedAnimal.AnimalID))
+                if (dgvAnimals.CurrentRow == null || dgvAnimals.CurrentRow.DataBoundItem == null)
                 {
+                    MessageBox.Show("Please select an animal to delete.", "Validation Error");
+                    return;
+                }
+
+                Animal selectedAnimal = dgvAnimals.CurrentRow.DataBoundItem as Animal;
+
+                if (selectedAnimal == null)
+                {
+                    MessageBox.Show("Please select a valid animal to delete.", "Validation Error");
+                    return;
+                }
+
+                DialogResult result = MessageBox.Show(
+                    "Delete " + selectedAnimal.AnimalID + " (" + selectedAnimal.Name + ")? This cannot be undone.",
+                    "Confirm Delete",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    animalDAL.DeleteAnimal(selectedAnimal.AnimalID);
                     MessageBox.Show("Animal deleted successfully!", "Success");
                     ExitEditMode();
                     LoadAnimalsData();
                 }
             }
-         }
-        private bool DeleteAnimalFromFile(string animalID)
-        {
-            try
+            catch (FileNotFoundException ex)
             {
-                if (!File.Exists(filePath))
-                {
-                    MessageBox.Show("animals.txt could not be found.", "File Error");
-                    return false;
-                }
-
-                List<string> lines = File.ReadAllLines(filePath).ToList();
-
-                //Removing lines matching animalID
-                lines.RemoveAll(line =>
-                {
-                    if (string.IsNullOrWhiteSpace(line)) return false;
-                    string lineID = line.Split('|')[0].Trim();
-                    return lineID.Equals(animalID, StringComparison.OrdinalIgnoreCase);
-                });
-
-                File.WriteAllLines(filePath, lines, new UTF8Encoding(false));
-                return true;
-            }
-            catch (FileNotFoundException)
-            {
-                MessageBox.Show("animals.txt could not be found, animal was not deleted.", "File Error");
-            }
-            catch (DirectoryNotFoundException)
-            {
-                MessageBox.Show("The folder containing animals.txt could not be found, animal was not deleted", "File Error");
-            }
-            catch (IOException)
-            {
-                MessageBox.Show("Could not save file because it is open in another application.", "File Error");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("You do not have permissions to modify animals.txt, animal was not deleted.", "File Error");
+                MessageBox.Show(ex.Message, "File Error");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An unexpected error occured while deleting: " + ex.Message, "Error");
+                MessageBox.Show("Error deleting animal: " + ex.Message, "Error");
             }
-            return false;
         }
-    }
 
+    }
 }
