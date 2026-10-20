@@ -129,42 +129,12 @@ namespace PRG282_PROJECT
 
         public void SaveSummary(List<Animal> animals, bool append)
         {
-            int totalAnimals = animals.Count;
-            double averageAge = totalAnimals > 0 ? animals.Average(a => a.Age) : 0.00;
-            double averageScore = totalAnimals > 0 ? animals.Average(a => (double)a.RecoveryScore) : 0.00;
-
-            string averageAgeText = totalAnimals > 0
-                ? averageAge.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
-                : "N/A";
-            string averageScoreText = totalAnimals > 0
-                ? averageScore.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
-                : "N/A";
-
-            StringBuilder report = new StringBuilder();
-            report.AppendLine("BAOBAB RIDGE WILDLIFE REHABILITATION CENTRE");
-            report.AppendLine("ANIMAL SUMMARY REPORT");
-            report.AppendLine("Generated: " + System.DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
-            report.AppendLine("----------------------------------------");
-            report.AppendLine("Total animals: " + totalAnimals);
-            report.AppendLine("Average age (years): " + averageAgeText);
-            report.AppendLine("Average recovery score: " + averageScoreText);
-            report.AppendLine("----------------------------------------");
-            report.AppendLine("Animals per status:");
-            report.AppendLine(" Critical: " + animals.Count(a => a.HealthStatus.Equals("Critical", StringComparison.OrdinalIgnoreCase)));
-            report.AppendLine(" Serious: " + animals.Count(a => a.HealthStatus.Equals("Serious", StringComparison.OrdinalIgnoreCase)));
-            report.AppendLine(" Stable: " + animals.Count(a => a.HealthStatus.Equals("Stable", StringComparison.OrdinalIgnoreCase)));
-            report.AppendLine(" Recovering: " + animals.Count(a => a.HealthStatus.Equals("Recovering", StringComparison.OrdinalIgnoreCase)));
-            report.AppendLine(" Release-Ready: " + animals.Count(a => a.HealthStatus.Equals("Release-Ready", StringComparison.OrdinalIgnoreCase)));
-
-            string entry = report.ToString() + Environment.NewLine + "----------------------------------------" + Environment.NewLine;
+            string report = new SummaryReport(animals).ToText(DateTime.Now);
+        
             if (append)
-            {
-                handler.AppendAllText("summary.txt", entry);
-            }
+                handler.AppendAllText("summary.txt", report + "----------------------------------------" + Environment.NewLine);
             else
-            {
-                handler.WriteAllText("summary.txt", entry);
-            }
-        }
+                handler.WriteAllText("summary.txt", report);
+        }    
     }
 }
