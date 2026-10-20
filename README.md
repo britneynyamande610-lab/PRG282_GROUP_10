@@ -23,8 +23,8 @@ The **Animal Management System** is a C# Windows Forms desktop application desig
 
 ## Group Members & Responsibilities
 * **Britney Nyamande (604954)** - Core Setup, View & Add Feature
-* **Henko Vermeulen (603727) - Update & Edit Feature
-* **Kgosi () ** - Summary Report Feature 
+* **Henko Vermeulen (603727)** - Update & Edit Feature
+* **Kgosi Senoge(604073)** - Summary Report Feature 
 * **Joshua Le Roux (603435)** - Delete, Error Handling Feature & README
 
 ---
