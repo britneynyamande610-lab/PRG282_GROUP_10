@@ -24,6 +24,7 @@ namespace PRG282_PROJECT
         public Form1()
         {
             InitializeComponent();
+             animalDAL = new AnimalDAL(filePath);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -35,97 +36,86 @@ namespace PRG282_PROJECT
 
         private void LoadAnimalsData()
         {
-            List<Animal> animalList = new List<Animal>();
-            int skippedCount = 0;
-
             try
-            {
-                if (!File.Exists(filePath))
-                {
-                    using (StreamWriter writer = new StreamWriter(filePath)) { }
-                    MessageBox.Show("File missing. Created new animals.txt.", "Info");
-
-                }
-
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (string.IsNullOrWhiteSpace(line)) continue;
-
-                        string[] parts = line.Split('|');
-
-                        if ((parts.Length == 5 || parts.Length == 7) &&
-                            int.TryParse(parts[3], out int age) &&
-                            int.TryParse(parts[4], out int score) &&
-                            score >= 0 && score <= 100)
-                        {
-                            Animal animal = new Animal(parts[0], parts[1], parts[2], age, score);
-                            animalList.Add(animal);
-                        }
-                        else
-                        {
-                            skippedCount++;
-                        }
-                    }
-                }
-
-                if (skippedCount > 0)
-                {
-                    MessageBox.Show($"Skipped {skippedCount} invalid line(s).", "Warning");
-                }
+            {  List<Animal> animalList = animalDAL.GetAllAnimals();
 
                 dgvAnimals.DataSource = null;
                 dgvAnimals.DataSource = animalList;
+            
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                MessageBox.Show("Error reading file: " + ex.Message, "Error");
+            MessageBox.Show("Error reading file: " + ex.Message, "Error");
             }
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
 
-            try
-            {
+    try
+    {
 
                 string id = txtID.Text;
                 string name = txtName.Text;
                 string species = txtSpecies.Text;
                 string ageText = txtAge.Text;
                 string scoreText = txtScore.Text;
+     if (string.IsNullOrEmpty(id))
+    {
+        MessageBox.Show("ID is required.", "Validation Error");
+        return;
+    }
 
-                if (!id.StartsWith("WR-") || id.Contains("|"))
-                {
-                    MessageBox.Show("ID must start with 'WR-' and not contain '|'.", "Validation Error");
-                    return;
-                }
+    if (!id.StartsWith("WR-"))
+    {
+        MessageBox.Show("ID must start with 'WR-'.", "Validation Error");
+        return;
+    }
 
-                if (!int.TryParse(scoreText, out int score) || score < 0 || score > 100)
-                {
-                    MessageBox.Show("Score must be between 0 and 100.", "Validation Error");
-                    return;
-                }
+    if (id.Contains("|"))
+    {
+        MessageBox.Show("ID must not contain '|'.", "Validation Error");
+        return;
+    }
 
-                if (!int.TryParse(ageText, out int age))
-                {
-                    MessageBox.Show("Age must be a valid integer.", "Validation Error");
-                    return;
-                }
+            int score;
+            if (int.TryParse(scoreText, out score))
+        {
+            if (score < 0 || score > 100)
+            {
+            MessageBox.Show("Score must be between 0 and 100.", "Validation Error");
+            return;
+            }
+            }
+            else
+            {
+            MessageBox.Show("Score must be a whole number.", "Validation Error");
+            return;
+            }
 
-                Animal newAnimal = new Animal(id, name, species, age, score);
+            int age;
+            if (int.TryParse(ageText, out age))
+            {
+            if (age < 0 || age > 100)
+            {
+            MessageBox.Show("Age must a number between 0 and 100", "Validation Error");
+            return;
+            }
+            }
+            else
+            {
+            MessageBox.Show("Age must be a whole number.", "Validation Error");
+            return;
+            }
 
-                using (StreamWriter writer = new StreamWriter(filePath, append: true))
-                {
-                    writer.WriteLine($"{newAnimal.AnimalID}|{newAnimal.Name}|{newAnimal.Species}|{newAnimal.Age}|{newAnimal.RecoveryScore}");
-                }
+            Animal newAnimal = new Animal(id, name, species, age, score);
+            animalDAL.InsertAnimal(newAnimal);
 
-                MessageBox.Show("Animal added successfully!", "Success");
-
-                ClearInputs();
-                LoadAnimalsData();
+            MessageBox.Show("Animal added successfully!", "Success");
+            ClearInputs();
+            LoadAnimalsData();
+            }
+               
             }
             catch (Exception ex)
             {
